@@ -1,0 +1,33 @@
+import sqlite3
+sql = """
+DROP TABLE IF EXISTS People;
+CREATE TABLE People(
+FirstName TEXT,
+LastName TEXT,
+Age INT
+); """
+
+insert_values = """
+INSERT INTO People VALUES(
+    'Ron',
+    'Obvious',
+    42
+);"""
+with sqlite3.connect("test_database.db") as connection:
+    cursor = connection.cursor()
+    cursor.executescript(sql) # Создание таблицы
+    cursor.executescript(insert_values)  # Вставка одного значения
+# вставка в таблицу БД одновременно нескольких значений
+    people_values = (
+        ("Ronny", "Fogel", 26),
+        ("Luigi", "Vercotty", 43),
+        ("Arthur", "Belling", 28)
+    )
+    cursor.executemany("INSERT INTO People VALUES(?,  ?,  ?)", people_values)
+# Выполнение запроса на выборку данных
+    query = "SELECT * FROM People;"
+    result = cursor.execute(query)
+
+    # Печать результата
+    for row in result.fetchall():
+        print(row)
